@@ -5,6 +5,8 @@ configure_aur: yes
 configure_dotfiles: yes
 configure_sudoers: yes
 
+aur_helper: yay
+
 homebrew_installed_packages:
   - git
   - httpie

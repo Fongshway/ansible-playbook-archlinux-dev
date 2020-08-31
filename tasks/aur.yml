@@ -1,6 +1,6 @@
 ---
-- name: Install yay using makepkg.
+- name: Install aur helper using makepkg.
   aur:
-    name: yay
+    name: "{{ aur_helper }}"
     use: makepkg
     state: present
