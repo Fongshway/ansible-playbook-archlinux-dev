@@ -82,6 +82,7 @@ Vagrant.configure("2") do |config|
   # For full set of options see https://www.vagrantup.com/docs/provisioning/ansible_common.html
   config.vm.provision "ansible_local" do |ansible|
     ansible.install = false
+    ansible.compatibility_mode = "2.0"
     ansible.verbose = "v"
     ansible.playbook = "/vagrant/main.yml"
   end
