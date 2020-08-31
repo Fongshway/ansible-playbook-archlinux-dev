@@ -12,14 +12,17 @@
       tags: ['always']
 
   roles:
-    # - role: geerlingguy.homebrew
-    #   tags: ['homebrew']
+    - role: kewlfft.aur
     - role: geerlingguy.dotfiles
       when: configure_dotfiles
       tags: ['dotfiles']
 
   tasks:
     - include_tasks: tasks/ansible-setup.yml
+
+    - include_tasks: tasks/aur.yml
+      when: configure_aur
+      tags: ['aur']
 
     # - include_tasks: tasks/sudoers.yml
     #   when: configure_sudoers

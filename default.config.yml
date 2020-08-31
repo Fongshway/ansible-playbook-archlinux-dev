@@ -1,6 +1,7 @@
 ---
 downloads: ~/.ansible-downloads/
 
+configure_aur: yes
 configure_dotfiles: yes
 configure_sudoers: yes
 
