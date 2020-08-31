@@ -75,6 +75,7 @@ Vagrant.configure("2") do |config|
     sudo reflector -l 10 --sort rate --save /etc/pacman.d/mirrorlist
     sudo pacman -S --noconfirm git python-pip
     pip install pipenv==2020.8.13
+    cd /vagrant; pipenv install --deploy
   SHELL
 
   # Config vm with ansible

@@ -18,9 +18,6 @@ jobs:
     - name: Vagrant setup
       run: vagrant up --provision-with shell
 
-    - name: Install Python dependencies via pipenv
-      run: vagrant ssh -c "cd /vagrant; pipenv install --deploy"
-
     - name: Install Ansible role dependencies via ansible-galaxy
       run: |
         vagrant ssh -c "cd /vagrant; pipenv run ansible-galaxy install -r requirements.yml"
