@@ -73,7 +73,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", inline: <<-SHELL
     sudo pacman -Syyu --noconfirm --noprogressbar --quiet reflector
     sudo reflector -l 10 --sort rate --save /etc/pacman.d/mirrorlist
-    sudo pacman -S --noconfirm git python-pip
+    sudo pacman -S --noconfirm binutils fakeroot gcc git make python-pip which
     pip install pipenv==2020.8.13
     cd /vagrant; pipenv install --deploy
   SHELL
