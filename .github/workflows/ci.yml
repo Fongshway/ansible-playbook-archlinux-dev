@@ -1,48 +1,51 @@
-# Only run this when the master branch changes
+# Trigger this workflow on push or pull request, but only for the master branch.
 on:
   push:
     branches:
     - master
+  pull_request:
+    branches:
+    - master
 
-# This job installs dependencies, build the book, and pushes it to `gh-pages`
+# This job installs dependencies and runs the playbook in Vagrant.
 jobs:
   build:
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@v2
 
-    - name: Check vagrant and virtualbox versions
+    - name: Check vagrant and virtualbox versions.
       run: vagrant -v && vboxmanage -v
 
     # Install dependencies
-    - name: Vagrant setup
+    - name: Vagrant setup.
       run: vagrant up --provision-with shell
 
-    - name: Install Ansible role dependencies via ansible-galaxy
+    - name: Install Ansible role dependencies via ansible-galaxy.
       run: |
         vagrant ssh -c "cd /vagrant; pipenv run ansible-galaxy install -r requirements.yml"
 
-    - name: Check the role/playbook's syntax
+    - name: Check the role/playbook's syntax.
       run: |
         vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook main.yml --syntax-check -i inventory"
 
     # Setup for playbook tests
-    - name: Add a hosts file
+    - name: Add a hosts file.
       run: |
         vagrant ssh -c "cd /vagrant; sudo mkdir -p /etc/ansible"
         vagrant ssh -c "cd /vagrant; sudo touch /etc/ansible/hosts"
         vagrant ssh -c "cd /vagrant; echo -e '[local]\nlocalhost ansible_connection=local' | sudo tee -a /etc/ansible/hosts > /dev/null"
 
-    - name: Copy test config.yml into place
+    - name: Copy test config.yml into place.
       run: |
         cp tests/config.yml config.yml
 
     # Test the playbook
-    - name: Run main.yml playbook
+    - name: Run main.yml playbook.
       run: |
         vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook --extra-vars '{\"configure_sudoers\":\"false\"}' main.yml"
 
-    - name: Test playbook's idempotence
+    - name: Test playbook's idempotence.
       run: |
         idempotence=$(mktemp)
         vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook --extra-vars '{\"configure_sudoers\":\"false\"}' main.yml" | tee -a ${idempotence}
