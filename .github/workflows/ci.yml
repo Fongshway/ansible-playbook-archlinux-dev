@@ -1,0 +1,52 @@
+# Only run this when the master branch changes
+on:
+  push:
+    branches:
+    - master
+
+# This job installs dependencies, build the book, and pushes it to `gh-pages`
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Check vagrant and virtualbox versions
+      run: vagrant -v && vboxmanage -v
+
+    # Install dependencies
+    - name: Vagrant setup
+      run: vagrant up --provision-with shell
+
+    - name: Install Python dependencies via pipenv
+      run: vagrant ssh -c "cd /vagrant; pipenv install --deploy"
+
+    - name: Install Ansible role dependencies via ansible-galaxy
+      run: |
+        vagrant ssh -c "cd /vagrant; pipenv run ansible-galaxy install -r requirements.yml"
+
+    - name: Check the role/playbook's syntax
+      run: |
+        vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook main.yml --syntax-check -i inventory"
+
+    # Setup for playbook tests
+    - name: Add a hosts file
+      run: |
+        vagrant ssh -c "cd /vagrant; sudo mkdir -p /etc/ansible"
+        vagrant ssh -c "cd /vagrant; sudo touch /etc/ansible/hosts"
+        vagrant ssh -c "cd /vagrant; echo -e '[local]\nlocalhost ansible_connection=local' | sudo tee -a /etc/ansible/hosts > /dev/null"
+
+    - name: Copy test config.yml into place
+      run: |
+        cp tests/config.yml config.yml
+
+    # Test the playbook
+    - name: Run main.yml playbook
+      run: |
+        vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook --extra-vars '{\"configure_sudoers\":\"false\"}' main.yml"
+
+    - name: Test playbook's idempotence
+      run: |
+        idempotence=$(mktemp)
+        vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook --extra-vars '{\"configure_sudoers\":\"false\"}' main.yml" | tee -a ${idempotence}
+        tail ${idempotence} | grep -q 'changed=0.*failed=0' && (echo 'Idempotence test: pass' && exit 0) || (echo 'Idempotence test: fail' && exit 1)
