@@ -6,14 +6,15 @@
     - default.config.yml
 
   pre_tasks:
-    - include_vars: "{{ item }}"
+    - name: Load variables from user config.
+      include_vars: "{{ item }}"
       with_fileglob:
         - "{{ playbook_dir }}/config.yml"
       tags: ['always']
 
   roles:
-    - role: kewlfft.aur
-    - role: geerlingguy.dotfiles
+    - role: kewlfft_aur
+    - role: geerlingguy_dotfiles
       when: configure_dotfiles
       tags: ['dotfiles']
 
