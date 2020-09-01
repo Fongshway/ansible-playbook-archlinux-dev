@@ -8,6 +8,7 @@
   file:
     path: /etc/ansible
     state: directory
+    mode: 0755
   become: yes
 
 - name: Symlink /usr/local/etc/ansible to /etc/ansible.
@@ -15,4 +16,5 @@
     src: /etc/ansible
     path: /usr/local/etc/ansible
     state: link
+    mode: 0755
   become: yes
