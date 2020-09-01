@@ -1,3 +1,5 @@
 ---
-- name: geerlingguy.dotfiles
-- name: kewlfft.aur
+- name: geerlingguy_dotfiles
+  src: geerlingguy.dotfiles
+- name: kewlfft_aur
+  src: kewlfft.aur

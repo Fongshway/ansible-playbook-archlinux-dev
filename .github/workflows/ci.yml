@@ -25,9 +25,10 @@ jobs:
       run: |
         vagrant ssh -c "cd /vagrant; pipenv run ansible-galaxy install -r requirements.yml"
 
-    - name: Check the role/playbook's syntax.
+    - name: Check the playbook's syntax and run ansible-lint.
       run: |
         vagrant ssh -c "cd /vagrant; pipenv run ansible-playbook main.yml --syntax-check -i inventory"
+        vagrant ssh -c "cd /vagrant; pipenv run ansible-lint main.yml"
 
     # Setup for playbook tests
     - name: Add a hosts file.
